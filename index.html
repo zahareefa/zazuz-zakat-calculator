@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zazuz Zakat Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 100%;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #333;
+    }
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #e9ecef;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .distribution-form {
+      margin-top: 20px;
+    }
+    .distribution-form h2 {
+      color: #2c3e50;
+      text-align: center;
+    }
+    .distribution-list {
+      margin-top: 20px;
+    }
+    .distribution-list ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    .distribution-list li {
+      background-color: #f8f9fa;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+    .clear-button {
+      background-color: #dc3545;
+      margin-top: 10px;
+    }
+    .clear-button:hover {
+      background-color: #c82333;
+    }
+    .export-button {
+      background-color: #007bff;
+      margin-top: 10px;
+    }
+    .export-button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Zazuz Zakat Calculator</h1>
+
+    <!-- Zakat Calculation Form -->
+    <form id="zakatForm">
+      <label for="cash">Cash in Hand/Bank:</label>
+      <input type="number" id="cash" placeholder="Enter amount" required>
+
+      <label for="gold">Gold Value:</label>
+      <input type="number" id="gold" placeholder="Enter amount" required>
+
+      <label for="silver">Silver Value:</label>
+      <input type="number" id="silver" placeholder="Enter amount" required>
+
+      <label for="investments">Investments:</label>
+      <input type="number" id="investments" placeholder="Enter amount" required>
+
+      <label for="liabilities">Liabilities/Debts:</label>
+      <input type="number" id="liabilities" placeholder="Enter amount" required>
+
+      <button type="submit">Calculate Zakat</button>
+    </form>
+
+    <!-- Zakat Result -->
+    <div id="result" class="result" style="display: none;">
+      Your Zakat Amount: ?<span id="zakatAmount">0</span>
+    </div>
+
+    <!-- Distribution Form -->
+    <div class="distribution-form">
+      <h2>Distribute Zakat</h2>
+      <form id="distributionForm">
+        <label for="name">Beneficiary Name:</label>
+        <input type="text" id="name" placeholder="Enter name" required>
+
+        <label for="amount">Amount:</label>
+        <input type="number" id="amount" placeholder="Enter amount" required>
+
+        <label for="purpose">Purpose:</label>
+        <input type="text" id="purpose" placeholder="Enter purpose" required>
+
+        <button type="submit">Add Distribution</button>
+      </form>
+    </div>
+
+    <!-- Distribution List -->
+    <div class="distribution-list">
+      <h2>Distribution Records</h2>
+      <ul id="distributionRecords"></ul>
+    </div>
+
+    <!-- Clear and Export Buttons -->
+    <button class="clear-button" onclick="clearAllData()">Clear All Data</button>
+    <button class="export-button" onclick="exportToPDF()">Export Distribution List as PDF</button>
+  </div>
+
+  <script>
+    // Zakat Calculation
+    document.getElementById('zakatForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      // Get input values
+      const cash = parseFloat(document.getElementById('cash').value) || 0;
+      const gold = parseFloat(document.getElementById('gold').value) || 0;
+      const silver = parseFloat(document.getElementById('silver').value) || 0;
+      const investments = parseFloat(document.getElementById('investments').value) || 0;
+      const liabilities = parseFloat(document.getElementById('liabilities').value) || 0;
+
+      // Calculate total wealth and Zakat
+      const totalWealth = cash + gold + silver + investments - liabilities;
+      const zakat = totalWealth >= 0 ? totalWealth * 0.025 : 0;
+
+      // Display result
+      document.getElementById('zakatAmount').textContent = zakat.toFixed(2);
+      document.getElementById('result').style.display = 'block';
+    });
+
+    // Distribution Tracking
+    document.getElementById('distributionForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      // Get input values
+      const name = document.getElementById('name').value;
+      const amount = parseFloat(document.getElementById('amount').value);
+      const purpose = document.getElementById('purpose').value;
+
+      // Create list item
+      const li = document.createElement('li');
+      li.innerHTML = `<strong>${name}</strong> - ?${amount.toFixed(2)} (${purpose})`;
+
+      // Add to distribution list
+      document.getElementById('distributionRecords').appendChild(li);
+
+      // Clear form
+      document.getElementById('distributionForm').reset();
+    });
+
+    // Clear All Data
+    function clearAllData() {
+      document.getElementById('zakatForm').reset();
+      document.getElementById('result').style.display = 'none';
+      document.getElementById('distributionRecords').innerHTML = '';
+    }
+
+    // Export Distribution List as PDF
+    function exportToPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      // Add title
+      doc.setFontSize(18);
+      doc.text("Zakat Distribution Records", 10, 10);
+
+      // Add distribution records
+      const records = document.getElementById('distributionRecords').children;
+      let y = 20;
+      for (let i = 0; i < records.length; i++) {
+        doc.setFontSize(12);
+        doc.text(records[i].innerText, 10, y);
+        y += 10;
+      }
+
+      // Save PDF
+      doc.save('Zakat_Distribution_Records.pdf');
+    }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</body>
+</html>
